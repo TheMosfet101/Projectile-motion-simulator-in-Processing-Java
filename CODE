@@ -1,0 +1,383 @@
+// Projectile motion simulator.
+// Author: Rafay Shah
+//Includes the following features: Being able to input the values of the projectile's X/Y position, it's angle, and intital velocity. Being able to toggle on/simulate linear air resistance and inputting the projectile's mass, while seeing values of it's intital horizontal/vertical velocity, it's maximum time, maximum height, and range of the total flight. Finally, being to view the stats (Intital velocity, angle of projection, mass, X/Y position) at the end of a projectile's motion while being able to reset all of it's current values and paths made during it's run.
+
+class paths{
+  float pathX;
+  float pathY;
+  int pathR;
+  int pathG;
+  int pathB;
+  float posX;
+  float posY;
+  float Vel0;
+  float angle0;
+  float mass;
+  boolean airdrag;
+  boolean isbreak;
+  paths(float tempX, float tempY,int tempR,int tempG,int tempB,float tempPosX,float tempPosY,float tempVelo0,float tempAngle, float tempMass,boolean tempAirdrag){
+    pathX = tempX;
+    pathY = tempY;
+    pathR = tempR;
+    pathG = tempG;
+    pathB = tempB;
+    posX = tempPosX;
+    posY = tempPosY;
+    Vel0 = tempVelo0;
+    angle0 = tempAngle;
+    mass = tempMass;
+    airdrag = tempAirdrag;
+    isbreak = false;
+  }
+  paths(){
+    isbreak = true;
+  }
+  void display(){
+    if(!isbreak){
+      pushStyle();
+      noStroke();
+      fill(pathR,pathG,pathB);
+      circle(pathX,pathY,5);
+      popStyle();
+    }
+  }
+  void stats(){
+    pushStyle();
+    textSize(12);
+    fill(0,255,0);
+    text("Air resistance enabled: " + airdrag,10,40); 
+    text("projectile's Mass: " + mass,10,60); 
+    text("projectile's X: " + floor(posX),10,80); 
+    text("projectile's Y: " + floor(posY),10,100); 
+    text("Intital velocity: " + Vel0,10,120); 
+    text("Angle of projection: " + floor(angle0),10,140); 
+    popStyle();
+  }
+}
+String valueA,valueB,valueC,valueD,valueE;
+float cubeX,cubeY,Theta,Vx,Vy,Vy0,Vx0,ay,V0,Hmax,T,Range,X0,Y0,R,t,M;
+int buttonR,buttonG,buttoncheck,valueEx,valueEy,conX,conY,whiteconX,whiteconY,textX,textY,pathR,pathG,pathB;
+boolean airResistcheck,runcheck,pathcheck,pathadd;
+ArrayList<paths> path;
+void setup(){
+  path = new ArrayList<paths>();
+  path.add(new paths(-40,-40,0,0,0,32,340,0,0,20,false));
+  pathR = 255;
+  pathG = 255;
+  pathB = 255;
+  X0 = 32;
+  Y0 = 340;
+  M = 20;
+  size(640,480);
+  valueEx = -40;
+  valueEy = -40;
+  conX = -40;
+  conY = -40;
+  whiteconX = -40;
+  whiteconY = -40;
+  textX =-40;
+  textY = -40;
+  buttonR = 255;
+  buttonG = 0;
+  valueA = "32";
+  valueB = "340";
+  valueC = "";
+  valueD = "";
+  valueE = "20";
+  cubeX = 32;
+  cubeY = 340;
+  ay = 0.98;
+}
+void draw(){
+  background(0);
+  Vx0 = V0 * cos(radians(Theta));
+  Vy0 = V0 * sin(radians(Theta));
+  Hmax = (pow(Vy0,2)) / (2 * 0.98);
+  T = (2 * Vy0) / 0.98;
+  R = (pow(V0,2) * sin(2 * radians(Theta))) / 0.98;
+  if(runcheck){
+    pathadd = true;
+    if(!airResistcheck){
+      pathR = 255;
+      pathG = 255;
+      pathB = 255;
+    cubeX = X0 + Vx0 * t;
+    cubeY = Y0 - (Vy0 * t) + (0.5 * ay * pow(t,2));
+    t += 0.25;
+    } else {
+      float b = 1.05;
+      pathR = 166;
+      pathG = 166;
+      pathB = 166;
+      cubeX = X0 + (Vx0 * M / b) * (1 - (float) Math.exp(-b/M * t));
+      cubeY = Y0 - (M/b * (Vy0 + ((M* ay) / b)) * (1 - (float) Math.exp(-b * t/M)) - ((M * ay / b) * t));
+      t += 0.25;
+    }
+    if(cubeY > 360){
+    cubeY = 360;
+    runcheck = false;
+    pathadd = false;
+    t = 0;
+  }
+  }
+  fill(255);
+  textSize(15);
+  text("Vx0: " + String.format("%.1f",Vx0) + " m/s",7,24);
+  text("Vy0: " + String.format("%.1f",Vy0) + " m/s",127,24);
+  text("Tmax: " + String.format("%.1f",T) + " s",230,24);
+  text("Hmax: " + String.format("%.1f",Hmax)+ " m",347,24);
+  text("Range: " + String.format("%.1f",R) + " m",490,24);
+  pushStyle();
+  pushMatrix();
+  rectMode(CENTER);
+  translate(cubeX,cubeY);
+  if(!airResistcheck){
+  rotate(atan2(-Vx0,Vy0 - ay * t));
+  } else {
+    rotate(atan2(-(Vx0 * (float) Math.exp(-1.05 * t / M)),(Vy0 + M * ay / 1.05) * (float) Math.exp(-10.5 * t / M) - (M * ay / 1.05)));
+  }
+  rect(0,0,M,M);
+  popMatrix();
+  popStyle();
+  if(pathcheck){
+    if(pathadd){
+ path.add(new paths(cubeX,cubeY,pathR,pathG,pathB,X0,Y0,V0,Theta,M,airResistcheck));
+  stroke(255);
+  strokeWeight(3);
+  line(cubeX,cubeY,cubeX,Y0);
+    }
+    for(int i = 0; i < path.size(); i ++){
+      paths obj = path.get(i);
+      obj.display();
+    }
+    for(int h = 1; h < path.size(); h ++){
+      paths prev = path.get(h - 1);
+      paths curr = path.get(h);
+      if(!prev.isbreak && !curr.isbreak){
+        stroke(curr.pathR,curr.pathG,curr.pathB);
+        strokeWeight(3);
+        line(prev.pathX,prev.pathY,curr.pathX,curr.pathY);
+      }
+    }
+  }
+  for(int i = 0; i < path.size(); i ++){
+    paths pos = path.get(i);
+    float posX = pos.pathX;
+    float posY = pos.pathY;
+    if(dist(posX,posY,mouseX,mouseY) < 20){
+      pos.stats();
+    }
+  }
+  stroke(255);
+  fill(255);
+  strokeWeight(5);
+  line(0,370,640,370); 
+  fill(166,166,166);
+  stroke(0);
+  rect(1,390,100,30);
+  rect(1,430,100,30);
+  rect(113,390,100,30);
+  rect(113,430,100,30);
+  rect(conX,conY,100,30); 
+  rect(222,390,165,30);
+  rect(400,390,30,30);
+  fill(0);
+  textSize(15);
+  text("X:",5,410);
+  text("Angle:",117,410);
+  text("V0:",120,450);
+  text("M:",valueEx,valueEy);
+  text("Y:",5,450);
+  text("Reset all values/paths:",235,410);
+  pushStyle();
+  noStroke();
+  fill(255);
+  text("Add air resistance?",435,410);
+  rect(20,395,65,20); 
+  rect(160,395,45,20); 
+  rect(20,435,65,20); 
+  rect(145,436,60,20); 
+  rect(whiteconX,whiteconY,60,20); 
+  rect(570,396,40,45);
+  text("Run:",575,459);
+  textSize(12);
+  text("Welcome to the projectile motion simulator.",340,434);
+  text("you can adjust it's X/Y positions, it's angle,",340,450);
+  text("and intital velocity. Play around and learn!",340,465);
+  popStyle();
+  text(valueA + "|",25,410);
+  text(valueB + "|",25,450);
+  text(valueC + "|",165,410);
+  text(valueD + "|",150,450);
+  text(valueE + "|",textX,textY); 
+  fill(0);
+  triangle(582,427,582,410,600,418);
+  pushStyle();
+  noStroke();
+  fill(buttonR,buttonG,0);
+  rectMode(CENTER);
+  rect(415,405,14,14);
+  popStyle();
+  if(mouseX > 222 && mouseX < 387 && mouseY > 390 && mouseY < 420 && mousePressed){
+    cubeX = 32;
+    cubeY = 340;
+    Theta = 0;
+    V0 = 0;
+    M = 20;
+    valueA = "32";
+    valueB = "340";
+    valueC = "";
+    valueD = "";
+    valueE = "20";
+    pathadd = false;
+    path.clear();
+  }
+  if(mouseX > 20 && mouseX < 85 && mouseY > 395 && mouseY < 415 || (mouseX > 20 && mouseX < 85 && mouseY > 435 && mouseY < 455) || (mouseX > 160 && mouseX < 205 && mouseY > 395 && mouseY < 415) || (mouseX > 145 && mouseX < 205 && mouseY > 436 && mouseY < 456) || ( mouseX > whiteconX && mouseX < whiteconX + 60 && mouseY > whiteconY && mouseY < whiteconY + 20)){
+    cursor(TEXT);
+  } else if(mouseX > 222 && mouseX < 387 && mouseY > 390 && mouseY < 420 || (mouseX >  570 && mouseX < 610 && mouseY > 396 && mouseY < 441) || (dist(mouseX,mouseY,414,405) < 10)){
+    cursor(HAND);
+  } else {
+    cursor(ARROW);
+  }
+  if(dist(mouseX,mouseY,414,405) < 10 && mousePressed){
+    buttoncheck ++;
+  }
+  if(mouseX > 570 && mouseX < 610 && mouseY > 396 && mouseY < 441 && mousePressed){
+    runcheck = true;
+    pathcheck = true;
+    path.add(new paths());
+    t = 0;
+    cubeX = X0;
+    cubeY = Y0;
+  }
+  if(buttoncheck == 0){
+    airResistcheck = false;
+    buttonR = 255;
+    buttonG = 0;
+    valueEx = -40;
+    valueEy = -40;
+    conX = -40;
+    conY = -40;
+    whiteconX = -40;
+    whiteconY = -40;
+    textX = -40;
+    textY = -40;
+  } else if(buttoncheck == 1){
+    airResistcheck = true;
+    buttonG = 255;
+    buttonR = 0;
+    valueEx = 230;
+    valueEy = 450;
+    conX = 222;
+    conY = 430;
+    whiteconX = 255;
+    whiteconY = 436;
+    textX = 260;
+    textY = 450;
+  } else if (buttoncheck == 2){
+    buttoncheck = 0;
+  }
+}
+void keyPressed(){
+  if(valueA.length() < 3 && key >= '0' && key <= '9' && mouseX > 20 && mouseX < 85 && mouseY > 395 && mouseY < 415 && !runcheck){
+    valueA += key;
+  } else if(keyCode == BACKSPACE && mouseX > 20 && mouseX < 85 && mouseY > 395 && mouseY < 415 && valueA.length() > 0 && !runcheck){
+    valueA = valueA.substring(0,valueA.length() - 1);
+  }
+  if(keyCode == ENTER && mouseX > 20 && mouseX < 85 && mouseY > 395 && mouseY < 415 && valueA.length() > 0 && !runcheck) {
+    int posX = Integer.parseInt(valueA);
+    if(posX <= 3){
+      posX = 6;
+      valueA = Integer.toString(posX);
+      cubeX = posX;
+      X0 = posX;
+    } else if(posX > 230){
+      posX -= (posX - 230);
+      valueA = Integer.toString(posX);
+      cubeX = posX;
+      X0 = posX;
+    } else {
+      cubeX = posX;
+      X0 = posX;
+    }
+  }
+  if(valueB.length() < 3 && key >= '0' && key <= '9' && mouseX > 20 && mouseX < 85 && mouseY > 435 && mouseY < 455 && !runcheck){
+    valueB += key;
+  } else if(keyCode == BACKSPACE && mouseX > 20 && mouseX < 85 && mouseY > 435 && mouseY < 455 && valueB.length() > 0 && !runcheck){
+    valueB = valueB.substring(0,valueB.length() - 1);
+  }
+  if(keyCode == ENTER && mouseX > 20 && mouseX < 85 && mouseY > 435 && mouseY < 455 && valueB.length() > 0 && !runcheck){
+    int posY = Integer.parseInt(valueB);
+    if(posY > 355){
+      posY -= (posY - 355);
+      valueB = Integer.toString(posY);
+      cubeY = posY;
+      Y0 = posY;
+    } else if(posY < 220){
+      posY = 220;
+      valueB = Integer.toString(posY);
+      cubeY = posY;
+      Y0 = posY;
+    } else {
+      cubeY = posY;
+      Y0 = posY;
+    }
+  }
+  if(valueC.length() < 2 && key >= '0' && key <= '9' && mouseX > 160 && mouseX < 205 && mouseY > 395 && mouseY < 415 && !runcheck){
+    valueC += key;
+  } else if(keyCode == BACKSPACE &&  mouseX > 160 && mouseX < 205 && mouseY > 395 && mouseY < 415 && valueC.length() > 0 && !runcheck){
+    valueC = valueC.substring(0,valueC.length() - 1);
+  }
+  if(keyCode == ENTER && mouseX > 160 && mouseX < 205 && mouseY > 395 && mouseY < 415  && valueC.length() > 0 && !runcheck){
+    int angleVal = Integer.parseInt(valueC);
+    if(angleVal <= 0){
+      angleVal = 1;
+      valueC = Integer.toString(angleVal);
+      Theta = angleVal;
+    } else if(angleVal > 90){
+      angleVal -= (angleVal - 90);
+      valueC = Integer.toString(angleVal);
+      Theta = angleVal;
+    } else {
+      Theta = angleVal;
+    }
+  }
+  if(valueD.length() < 2 && key >= '0' && key <= '9' && mouseX > 145 && mouseX < 205 && mouseY > 436 && mouseY < 456 && !runcheck){
+    valueD += key;
+  } else if(keyCode == BACKSPACE && mouseX > 145 && mouseX < 205 && mouseY > 436 && mouseY < 456 && valueD.length() > 0 && !runcheck){
+    valueD = valueD.substring(0,valueD.length() - 1);
+  }
+  if(keyCode == ENTER && mouseX > 145 && mouseX < 205 && mouseY > 436 && mouseY < 456 && valueD.length() > 0 && !runcheck){
+    int Viy = Integer.parseInt(valueD);
+    if(Viy <= 0){
+      Viy = 1;
+      valueD = Integer.toString(Viy);
+      V0 = Viy;
+    } else if(Viy > 24) {
+      Viy -= (Viy - 24);
+      valueD = Integer.toString(Viy);
+      V0 = Viy;
+    } else {
+      V0 = Viy;
+    }
+  }
+  if(valueE.length() < 2 && key >= '0' && key <= '9' && mouseX > whiteconX && mouseX < whiteconX + 60 && mouseY > whiteconY && mouseY < whiteconY + 60 && !runcheck){
+    valueE += key;
+  } else if(keyCode == BACKSPACE && mouseX > 255 && mouseX < 315 && mouseY > 436 && mouseY < 456 && valueE.length() > 0 && !runcheck){
+    valueE = valueE.substring(0,valueE.length() - 1);
+  }
+  if(keyCode == ENTER && mouseX > 255 && mouseX < 315 && mouseY > 436 && mouseY < 456 && valueE.length() > 0 && !runcheck){
+    int Kg = Integer.parseInt(valueE);
+    if(Kg < 10){
+      Kg = 10;
+      valueE = Integer.toString(Kg);
+      M = Kg;
+    } else if(Kg > 60) {
+      Kg -= (Kg - 60);
+      valueE = Integer.toString(Kg);
+      M = Kg;
+    } else {
+      M = Kg;
+    }
+  }
+}
