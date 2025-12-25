@@ -239,7 +239,7 @@ void draw(){
   } else {
     cursor(ARROW);
   }
-  if(dist(mouseX,mouseY,414,405) < 10 && mousePressed){
+  if(dist(mouseX,mouseY,414,405) < 10 && mousePressed && !runcheck){
     buttoncheck ++;
   }
   if(mouseX > 570 && mouseX < 610 && mouseY > 396 && mouseY < 441 && mousePressed){
