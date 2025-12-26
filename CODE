@@ -1,6 +1,6 @@
 // Projectile motion simulator.
 // Author: Rafay Shah
-//Includes the following features: Being able to input the values of the projectile's X/Y position, it's angle, and intital velocity. Being able to toggle on/simulate linear air resistance and inputting the projectile's mass, while seeing values of it's intital horizontal/vertical velocity, it's maximum time, maximum height, and range of the total flight. Finally, being to view the stats (Intital velocity, angle of projection, mass, X/Y position) at the end of a projectile's motion while being able to reset all of it's current values and paths made during it's run.
+//Includes the following features: Being able to input the values of the projectile's X/Y position, it's angle, and intital velocity. Being able to toggle on/simulate linear air resistance and inputting the projectile's mass, while seeing values of it's intital horizontal/vertical velocity, it's maximum time, maximum height, and range of the total flight. Finally, being to view the stats (Intital velocity, angle of projection, mass, X/Y position) at the end of a projectile's motion while being able to reset all of it's current values and paths made during it's run. Plus, you are able to view the vector diagram of a projectile's horizontal velocity, vertical velocity, and total vector velocity.
 
 class paths{
   float pathX;
@@ -55,7 +55,7 @@ class paths{
   }
 }
 String valueA,valueB,valueC,valueD,valueE;
-float cubeX,cubeY,Theta,Vx,Vy,Vy0,Vx0,ay,V0,Hmax,T,Range,X0,Y0,R,t,M;
+float cubeX,cubeY,Theta,Vx,Vy,Vy0,Vx0,ay,V0,Hmax,T,Range,X0,Y0,R,t,M,vectorX,vectorY;
 int buttonR,buttonG,buttoncheck,valueEx,valueEy,conX,conY,whiteconX,whiteconY,textX,textY,pathR,pathG,pathB;
 boolean airResistcheck,runcheck,pathcheck,pathadd;
 ArrayList<paths> path;
@@ -90,6 +90,13 @@ void setup(){
 }
 void draw(){
   background(0);
+  if(!airResistcheck){
+  vectorX = Vx0;
+  } else {
+    vectorX = Vx0 * (float) Math.exp(-(1.05/M) * t);
+  }
+  vectorY = Vy0 - (0.98 * t);
+  PVector vector = new PVector(vectorX,vectorY);
   Vx0 = V0 * cos(radians(Theta));
   Vy0 = V0 * sin(radians(Theta));
   Hmax = (pow(Vy0,2)) / (2 * 0.98);
@@ -144,7 +151,16 @@ void draw(){
  path.add(new paths(cubeX,cubeY,pathR,pathG,pathB,X0,Y0,V0,Theta,M,airResistcheck));
   stroke(255);
   strokeWeight(3);
-  line(cubeX,cubeY,cubeX,Y0);
+  line(cubeX,cubeY,cubeX,Y0); 
+  stroke(255,0,0);
+  line(cubeX,cubeY,cubeX, cubeY - (vector.y * 4));
+  text("Vy",cubeX - 30,cubeY - (vector.y * 4));
+  text("Vx",cubeX + (vector.x * 4), cubeY + 20);
+  text("V0",(cubeX + (vector.x * 4)) - 15, (cubeY - (vector.x * 4)) + 30);
+  stroke(0,0,255);
+  line(cubeX,cubeY, cubeX + (vector.x * 4),cubeY);
+  stroke(0,255,0);
+  line(cubeX,cubeY,cubeX + (vector.x * 4), cubeY - (vector.y * 4));
     }
     for(int i = 0; i < path.size(); i ++){
       paths obj = path.get(i);
