@@ -156,7 +156,7 @@ void draw(){
   line(cubeX,cubeY,cubeX, cubeY - (vector.y * 4));
   text("Vy",cubeX - 30,cubeY - (vector.y * 4));
   text("Vx",cubeX + (vector.x * 4), cubeY + 20);
-  text("V0",(cubeX + (vector.x * 4)) - 15, (cubeY - (vector.x * 4)) + 30);
+  text("V0",(cubeX + (vector.x * 4)) - 15,cubeY - (vector.x * 4));
   stroke(0,0,255);
   line(cubeX,cubeY, cubeX + (vector.x * 4),cubeY);
   stroke(0,255,0);
