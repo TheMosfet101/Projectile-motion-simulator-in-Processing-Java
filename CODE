@@ -141,7 +141,7 @@ void draw(){
   if(!airResistcheck){
   rotate(atan2(-Vx0,Vy0 - ay * t));
   } else {
-    rotate(atan2(-(Vx0 * (float) Math.exp(-1.05 * t / M)),(Vy0 + M * ay / 1.05) * (float) Math.exp(-10.5 * t / M) - (M * ay / 1.05)));
+    rotate(atan2(-(Vx0 * (float) Math.exp(-1.05 * t / M)),(Vy0 + M * ay / 1.05) * (float) Math.exp(-1.05 * t / M) - (M * ay / 1.05)));
   }
   rect(0,0,M,M);
   popMatrix();
