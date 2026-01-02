@@ -98,7 +98,7 @@ void draw(){
   vectorY = Vy0 - (0.98 * t);
   PVector vector = new PVector(vectorX,vectorY);
   PVector drag = vector.copy().normalize().mult(-1).mult(40);
-  PVector dragvector = new Pvector(drag.x,-drag.y);
+  PVector dragvector = new PVector(drag.x,-drag.y);
   Vx0 = V0 * cos(radians(Theta));
   Vy0 = V0 * sin(radians(Theta));
   Hmax = (pow(Vy0,2)) / (2 * 0.98);
