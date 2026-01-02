@@ -97,6 +97,8 @@ void draw(){
   }
   vectorY = Vy0 - (0.98 * t);
   PVector vector = new PVector(vectorX,vectorY);
+  PVector drag = vector.copy().normalize().mult(-1).mult(40);
+  PVector dragvector = new Pvector(drag.x,-drag.y);
   Vx0 = V0 * cos(radians(Theta));
   Vy0 = V0 * sin(radians(Theta));
   Hmax = (pow(Vy0,2)) / (2 * 0.98);
@@ -180,7 +182,7 @@ void draw(){
   if(airResistcheck){
   text("Fd",(cubeX - (vector.x * 4)) - 6, (cubeY + (vector.y * 4)) - 20);
   stroke(255,165,0);
-  line(cubeX,cubeY, cubeX - (vector.x * 4), cubeY + (vector.y * 4));
+  line(cubeX,cubeY, cubeX + dragvector.x, cubeY + dragvector.y);
   }
     }
   }
